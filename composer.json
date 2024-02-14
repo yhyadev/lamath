@@ -1,5 +1,8 @@
 {
     "name": "yhyadev/lamath",
+    "require": {
+        "php": ">=8.1.0"
+    },
     "bin": [
         "bin/lamath"
     ],
