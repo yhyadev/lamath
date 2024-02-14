@@ -1,8 +1,11 @@
 {
     "name": "yhyadev/lamath",
+    "bin": [
+        "bin/lamath"
+    ],
     "autoload": {
         "psr-4": {
-            "LaMath\\": "src/"
+            "LaMath\\": "lib/"
         }
     }
 }
