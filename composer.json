@@ -1,0 +1,8 @@
+{
+    "name": "yhyadev/lamath",
+    "autoload": {
+        "psr-4": {
+            "LaMath\\": "src/"
+        }
+    }
+}
