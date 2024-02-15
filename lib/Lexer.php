@@ -6,13 +6,23 @@ use LaMath\Location;
 
 enum TokenKind
 {
+    case Number;
+
+    case Plus;
+    case Minus;
+    case Star;
+    case DoubleStar;
+    case ForwardSlash;
+
+    case Invalid;
     case EOF;
 }
 
 class Token
 {
-    public TokenKind $kind;
-    public string $value;
+    public function __construct(public TokenKind $kind, public string $value)
+    {
+    }
 }
 
 class Cursor
@@ -28,7 +38,16 @@ class Cursor
 
     public function consume(): string
     {
-        return $this->buffer[$this->index++];
+        $character = $this->buffer[$this->index++];
+
+        if ($character === "\n") {
+            $this->location->line += 1;
+            $this->location->column = 1;
+        } else {
+            $this->location->column += 1;
+        }
+
+        return $character;
     }
 
     public function peek(): string
@@ -44,7 +63,7 @@ class Cursor
 
 class Lexer
 {
-    private Cursor $cursor;
+    public Cursor $cursor;
 
     public function __construct(private string $file_path, string $buffer)
     {
@@ -53,21 +72,67 @@ class Lexer
 
     public function next_token(): Token
     {
-        $tok = new Token();
+        $token = new Token(TokenKind::EOF, "");
 
         $this->skip_whitespace();
 
-        if ($this->cursor->is_eof()) {
-            $tok->kind = TokenKind::EOF;
+        if ($this->cursor->is_eof()) return $token;
 
-            return $tok;
+        $character = $this->cursor->consume();
+
+        switch ($character) {
+            case "+":
+                $token = new Token(TokenKind::Plus, $character);
+
+                break;
+
+            case "-":
+                $token = new Token(TokenKind::Minus, $character);
+
+                break;
+
+            case "*":
+                if (!$this->cursor->is_eof() && $this->cursor->peek() === "*") {
+                    $this->cursor->consume();
+
+                    $token = new Token(TokenKind::DoubleStar, "**");
+                } else {
+                    $token = new Token(TokenKind::Star, $character);
+                }
+
+                break;
+
+            case "/":
+                $token = new Token(TokenKind::ForwardSlash, $character);
+
+                break;
+
+            default:
+                if (ctype_digit($character)) {
+                    $token = $this->tokenize_number($character);
+                } else {
+                    $token = new Token(TokenKind::Invalid, $character);
+                }
+
+                break;
         }
 
-        return $tok;
+        return $token;
     }
 
     private function skip_whitespace()
     {
         while (!$this->cursor->is_eof() && ctype_space($this->cursor->peek())) $this->cursor->consume();
+    }
+
+    private function tokenize_number(string $first_character): Token
+    {
+        $literal = $first_character;
+
+        while (!$this->cursor->is_eof() && ctype_digit($this->cursor->peek())) {
+            $literal = $literal . $this->cursor->consume();
+        }
+
+        return new Token(TokenKind::Number, $literal);
     }
 }

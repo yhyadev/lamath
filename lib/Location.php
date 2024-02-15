@@ -9,4 +9,8 @@ class Location
     {
         
     }
+
+    public function display() {
+        return sprintf("%d:%d", $this->line, $this->column);
+    }
 }
