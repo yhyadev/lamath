@@ -10,6 +10,6 @@ class Location
 
     public function display(): string
     {
-        return sprintf("%d:%d", $this->line, $this->column);
+        return "{$this->line}:{$this->column}";
     }
 }

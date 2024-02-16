@@ -12,6 +12,6 @@ class Error
 
     public function display(): string
     {
-        return sprintf("%s:%s: %s", $this->file_path, $this->location->display(), $this->message);
+        return "{$this->file_path}:{$this->location->display()}: {$this->message}";
     }
 }

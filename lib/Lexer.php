@@ -144,7 +144,7 @@ class Lexer
     {
         $literal = $first_character;
 
-        while (!$this->cursor->is_eof() && ctype_digit($this->cursor->peek())) {
+        while (!$this->cursor->is_eof() && (ctype_digit($this->cursor->peek()) || $this->cursor->peek() === ".")) {
             $literal = $literal . $this->cursor->consume();
         }
 

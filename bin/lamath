@@ -2,3 +2,58 @@
 <?php
 
 require __DIR__ . "/../vendor/autoload.php";
+
+use LaMath\Evaluator;
+use LaMath\Error;
+use LaMath\AST\Parser;
+use LaMath\Value;
+
+function evaluate_and_print(string $file_path, string $input): bool
+{
+    $parser = new Parser($input);
+
+    $procedure = $parser->parse();
+
+    if ($procedure instanceof Error) {
+        $procedure->file_path = $file_path;
+
+        echo $procedure->display() . "\n";
+
+        return false;
+    }
+
+    $evaluator = new Evaluator();
+
+    $values = $evaluator->evaluate($procedure);
+
+    if ($values instanceof Error) {
+        $values->file_path = $file_path;
+
+        echo $values->display() . "\n";
+
+        return false;
+    }
+
+    foreach ($values as $value) {
+        if ($value instanceof Value) {
+            echo $value->display() . "\n";
+        }
+    }
+
+    return true;
+}
+
+function repl()
+{
+    while (true) {
+        echo ">> ";
+
+        $input = fgets(STDIN);
+
+        if (!evaluate_and_print("<stdin>", $input)) {
+            continue;
+        }
+    }
+}
+
+repl();
