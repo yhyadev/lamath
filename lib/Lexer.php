@@ -2,8 +2,6 @@
 
 namespace LaMath;
 
-use LaMath\Location;
-
 enum TokenKind
 {
     case Number;
@@ -29,13 +27,18 @@ class Token
 
 class Cursor
 {
-    private int $index;
+    public int $index;
     public Location $location;
 
     public function __construct(private string $buffer)
     {
         $this->index = 0;
         $this->location = new Location(1, 0);
+    }
+
+    public function __clone()
+    {
+        $this->location = clone $this->location;
     }
 
     public function consume(): string
@@ -57,7 +60,7 @@ class Cursor
         return $this->buffer[$this->index];
     }
 
-    public function is_eof()
+    public function is_eof(): bool
     {
         return $this->index >= strlen($this->buffer);
     }
@@ -67,9 +70,14 @@ class Lexer
 {
     public Cursor $cursor;
 
-    public function __construct(private string $file_path, string $buffer)
+    public function __construct(string $buffer)
     {
         $this->cursor = new Cursor($buffer);
+    }
+
+    public function __clone()
+    {
+        $this->cursor = clone $this->cursor;
     }
 
     public function next_token(): Token

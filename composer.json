@@ -9,6 +9,9 @@
     "autoload": {
         "psr-4": {
             "LaMath\\": "lib/"
-        }
+        },
+        "classmap": [
+            "lib/"
+        ]
     }
 }
