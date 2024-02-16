@@ -14,6 +14,8 @@ enum TokenKind
     case DoubleStar;
     case ForwardSlash;
 
+    case Semicolon;
+
     case Invalid;
     case EOF;
 }
@@ -104,6 +106,11 @@ class Lexer
 
             case "/":
                 $token = new Token(TokenKind::ForwardSlash, $character);
+
+                break;
+
+            case ";":
+                $token = new Token(TokenKind::Semicolon, $character);
 
                 break;
 
