@@ -19,12 +19,12 @@ $ php bin/lamath
 - The steps must end with a ';'
 
 The available unary operators are:
-[]
+- [ ]
 
 The available binary operators are:
-[+, -, *, **]
-+: Addition
--: Subtraction
-*: Multiplication
-**: Exponentation
-/: Division
+- [+, -, *, **]
+- +: Addition
+- -: Subtraction
+- *: Multiplication
+- **: Exponentation
+- /: Division
