@@ -3,7 +3,10 @@
 A math interpreter written in PHP
 
 ## Quick Try
+**Note: PHP >=8.1.0 is required**
+
 ```console
+$ composer install
 $ php bin/lamath
 >> 5 + 5;
 10
