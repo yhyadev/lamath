@@ -1,0 +1,35 @@
+fs = import("fs")
+io = import("io")
+
+evaluator = import("evaluator.sy")
+parser = import("parser.sy")
+
+while true {
+    print(">> ")
+
+    input = fs.read_line(io.stdin)
+
+    if input == none {
+        break
+    }
+
+    parser.init(input)
+
+    procedure = parser.parse()
+
+    if typeof(procedure) == "string" {
+        println(procedure)
+
+        continue
+    }
+
+    numbers = evaluator.evaluate(procedure)
+
+    i = 0
+
+    while i < length(numbers) {
+        println(numbers[i])
+
+        i += 1
+    }
+}

@@ -1,0 +1,129 @@
+ctx = {}
+
+state = {
+    "START": 0,
+    "NUMBER": 1,
+    "STAR": 2,
+}
+
+token_kind = {
+    "EOF": 0,
+    "INVALID": 1,
+    "NUMBER": 2,
+    "PLUS": 3,
+    "MINUS": 4,
+    "FORWARD_SLASH": 5,
+    "STAR": 6,
+    "DOUBLE_STAR": 7,
+}
+
+init = fn (buffer) {
+    ctx.buffer = buffer
+    ctx.index = 0
+    ctx.state = state.START 
+}
+
+is_space = fn (char) {
+    if char == " " {
+        return true
+    } else if char == "\n" {
+        return true
+    } else if char == "\r" {
+        return true
+    } else if char == "\t" {
+        return true
+    }
+
+    return false
+}
+
+is_digit = fn (char) {
+    if ord(char) > 47 {
+        if ord(char) < 58 {
+            return true
+        }
+    }
+
+    return false
+}
+
+next_token = fn () {
+    token = {
+        "kind": token_kind.EOF,
+        "buffer_loc": {
+            "start": ctx.index,
+            "end": ctx.index,
+        }
+    }
+
+    while ctx.index < length(ctx.buffer) {
+        char = ctx.buffer[ctx.index]
+
+        if ctx.state == state.START {
+            if is_space(char) {
+                ctx.index += 1
+                token.buffer_loc.start = ctx.index
+                token.buffer_loc.end = ctx.index
+                continue
+            }
+
+            if char == "+" {
+                token.kind = token_kind.PLUS
+                ctx.index += 1
+                token.buffer_loc.end = ctx.index
+                break
+            } else if char == "-" {
+                token.kind = token_kind.MINUS
+                ctx.index += 1
+                token.buffer_loc.end = ctx.index
+                break
+            } else if char == "/" {
+                token.kind = token_kind.FORWARD_SLASH
+                ctx.index += 1
+                token.buffer_loc.end = ctx.index
+                break
+            } else if char == "*" {
+                token.kind = token_kind.STAR
+                ctx.state = state.STAR
+            } else if is_digit(char) {
+                token.kind = token_kind.NUMBER
+                ctx.state = state.NUMBER
+            } else {
+                token.kind = token_kind.INVALID
+                ctx.index += 1
+                token.buffer_loc.end = ctx.index
+                break
+            }
+        } else if ctx.state == state.NUMBER {
+            if !is_digit(char) {
+                token.buffer_loc.end = ctx.index
+                ctx.state = state.START
+                break
+            }
+        } else if ctx.state == state.STAR {
+            if char == "*" {
+                ctx.index += 1
+                token.kind = token_kind.DOUBLE_STAR
+                token.buffer_loc.end = ctx.index
+                ctx.state = state.START
+                break
+            } else {
+                ctx.index += 1
+                token.buffer_loc.end = ctx.index
+                ctx.state = state.START
+                break
+            }
+        }
+
+        ctx.index += 1
+        token.buffer_loc.end = ctx.index
+    }
+
+    return token
+}
+
+export({
+    "init": init,
+    "next_token": next_token,
+    "token_kind": token_kind,
+})
