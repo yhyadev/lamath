@@ -1,6 +1,6 @@
 # LaMath
 
-A math interpreter written in [Syphon](https://github.com/syphon-lang/syphon), the [previously](https://github.com/yhyadev/lamath-php) was in PHP
+A math interpreter written in [Syphon](https://github.com/syphon-lang/syphon), [previously](https://github.com/yhyadev/lamath-php) was in PHP
 
 ## Quick Try
 
