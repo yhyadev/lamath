@@ -17,7 +17,9 @@ $ syphon src/main.sy
 - Steps are separated by space
 
 The available unary operators are:
-- [ ]
+- [-]
+
+- -: Negation
 
 The available binary operators are:
 - [+, -, /, *, **]

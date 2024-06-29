@@ -74,6 +74,7 @@ precedence_from_token = fn (token) {
 step_kind = {
     "NUMBER": 0,
     "BINARY_OPERATION": 1,
+    "UNARY_OPERATION": 2,
 }
 
 parse = fn () {
@@ -110,9 +111,19 @@ parse_step = fn (precedence) {
     return lhs
 }
 
+is_unary_operator = fn (token) {
+    if token.kind == lexer.token_kind.MINUS{
+        return true
+    } else {
+        return false
+    }
+}
+
 parse_unary_expression = fn () {
     if peek_token().kind == lexer.token_kind.NUMBER {
         return parse_number()
+    } else if is_unary_operator(peek_token()) {
+        return parse_unary_operation()
     } else {
         return "unexpected token"
     }
@@ -130,6 +141,29 @@ parse_number = fn () {
         "value": value,
     }
 }
+
+unary_operator_kind = {
+    "MINUS": 0,
+}
+
+unary_operator_from_token = fn (token) {
+    if token.kind == lexer.token_kind.MINUS {
+        return unary_operator_kind.MINUS
+    }
+}
+
+parse_unary_operation = fn () {
+    operator = unary_operator_from_token(next_token())
+
+    rhs = parse_step(precedence_kind.LOWEST)
+
+    return {
+        "kind": step_kind.UNARY_OPERATION,
+        "operator": operator,
+        "rhs": rhs,
+    }
+}
+
 
 is_binary_operator = fn (token) {
     if token.kind == lexer.token_kind.PLUS {
@@ -195,4 +229,5 @@ export({
     "parse": parse,
     "step_kind": step_kind,
     "binary_operator_kind": binary_operator_kind,
+    "unary_operator_kind": unary_operator_kind,
 })
