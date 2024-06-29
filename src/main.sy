@@ -1,26 +1,60 @@
 fs = import("fs")
 io = import("io")
+process = import("process")
 
 evaluator = import("evaluator.sy")
 parser = import("parser.sy")
 
-while true {
-    print(">> ")
+run_repl = fn () {
+    while true {
+        print(">> ")
 
-    input = fs.read_line(io.stdin)
+        input = fs.read_line(io.stdin)
 
-    if input == none {
-        break
+        if input == none {
+            break
+        }
+
+        parser.init(input)
+
+        procedure = parser.parse()
+
+        if typeof(procedure) == "string" {
+            println(procedure)
+            continue
+        }
+
+        numbers = evaluator.evaluate(procedure)
+
+        i = 0
+
+        while i < length(numbers) {
+            println(numbers[i])
+
+            i += 1
+        }
+    }
+}
+
+evaluate_file = fn () {
+    file = fs.open(process.argv[1])
+
+    if file == none {
+        println(file_path + ": could not open file")
+        exit(1)
     }
 
-    parser.init(input)
+    file_content = fs.read_all(file)
+
+    fs.close(file)
+
+    parser.init(file_content)
 
     procedure = parser.parse()
 
     if typeof(procedure) == "string" {
         println(procedure)
-
-        continue
+        exit(1)
     }
 
     numbers = evaluator.evaluate(procedure)
@@ -32,4 +66,10 @@ while true {
 
         i += 1
     }
+}
+
+if length(process.argv) < 2 {
+    run_repl()
+} else {
+    evaluate_file()
 }
