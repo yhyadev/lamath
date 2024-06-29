@@ -24,27 +24,11 @@ init = fn (buffer) {
 }
 
 is_space = fn (char) {
-    if char == " " {
-        return true
-    } else if char == "\n" {
-        return true
-    } else if char == "\r" {
-        return true
-    } else if char == "\t" {
-        return true
-    }
-
-    return false
+    return contains([" ", "\n", "\r", "\t"], char)
 }
 
 is_digit = fn (char) {
-    if ord(char) > 47 {
-        if ord(char) < 58 {
-            return true
-        }
-    }
-
-    return false
+    return contains("0123456789", char)
 }
 
 next_token = fn () {
