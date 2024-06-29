@@ -36,8 +36,8 @@ run_repl = fn () {
     }
 }
 
-evaluate_file = fn () {
-    file = fs.open(process.argv[1])
+evaluate_file = fn (file_path) {
+    file = fs.open(file_path)
 
     if file == none {
         println(file_path + ": could not open file")
@@ -68,8 +68,18 @@ evaluate_file = fn () {
     }
 }
 
+evaluate_files = fn () {
+    i = 1
+
+    while i < length(process.argv) {
+        evaluate_file(process.argv[i])
+
+        i += 1
+    }
+}
+
 if length(process.argv) < 2 {
     run_repl()
 } else {
-    evaluate_file()
+    evaluate_files()
 }
