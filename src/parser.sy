@@ -56,18 +56,18 @@ precedence_kind = {
 }
 
 precedence_from_token = fn (token) {
-    if token.kind == lexer.token_kind.PLUS {
-        return precedence_kind.SUM
-    } else if token.kind == lexer.token_kind.MINUS {
-        return precedence_kind.SUM
-    } else if token.kind == lexer.token_kind.FORWARD_SLASH {
-        return precedence_kind.PRODUCT
-    } else if token.kind == lexer.token_kind.STAR {
-        return precedence_kind.PRODUCT
-    } else if token.kind == lexer.token_kind.DOUBLE_STAR {
-        return precedence_kind.EXPONENT
-    } else {
+    map = {
+        lexer.token_kind.PLUS: precedence_kind.SUM,
+        lexer.token_kind.MINUS: precedence_kind.SUM,
+        lexer.token_kind.FORWARD_SLASH: precedence_kind.PRODUCT,
+        lexer.token_kind.STAR: precedence_kind.PRODUCT,
+        lexer.token_kind.DOUBLE_STAR: precedence_kind.EXPONENT,
+    }
+
+    if !contains(map_keys(map), token.kind) {
         return precedence_kind.LOWEST
+    } else {
+        return map[token.kind]
     }
 }
 
@@ -147,9 +147,11 @@ unary_operator_kind = {
 }
 
 unary_operator_from_token = fn (token) {
-    if token.kind == lexer.token_kind.MINUS {
-        return unary_operator_kind.MINUS
+    map = {
+        lexer.token_kind.MINUS: unary_operator_kind.MINUS,
     }
+
+    return map[token.kind]
 }
 
 parse_unary_operation = fn () {
@@ -166,19 +168,15 @@ parse_unary_operation = fn () {
 
 
 is_binary_operator = fn (token) {
-    if token.kind == lexer.token_kind.PLUS {
-        return true
-    } else if token.kind == lexer.token_kind.MINUS{
-        return true
-    } else if token.kind == lexer.token_kind.FORWARD_SLASH {
-        return true
-    } else if token.kind == lexer.token_kind.STAR {
-        return true
-    } else if token.kind == lexer.token_kind.DOUBLE_STAR {
-        return true
-    } else {
-        return false
-    }
+    binary_operator_tokens = [
+        lexer.token_kind.PLUS,
+        lexer.token_kind.MINUS,
+        lexer.token_kind.FORWARD_SLASH,
+        lexer.token_kind.STAR,
+        lexer.token_kind.DOUBLE_STAR,
+    ]
+
+    return contains(binary_operator_tokens, token.kind)
 }
 
 parse_binary_expression = fn (lhs) {
@@ -198,17 +196,15 @@ binary_operator_kind = {
 }
 
 binary_operator_from_token = fn (token) {
-    if token.kind == lexer.token_kind.PLUS {
-        return binary_operator_kind.PLUS
-    } else if token.kind == lexer.token_kind.MINUS {
-        return binary_operator_kind.MINUS
-    } else if token.kind == lexer.token_kind.FORWARD_SLASH {
-        return binary_operator_kind.FORWARD_SLASH
-    } else if token.kind == lexer.token_kind.STAR {
-        return binary_operator_kind.STAR
-    } else if token.kind == lexer.token_kind.DOUBLE_STAR {
-        return binary_operator_kind.DOUBLE_STAR
+    map = {
+        lexer.token_kind.PLUS: binary_operator_kind.PLUS,
+        lexer.token_kind.MINUS: binary_operator_kind.MINUS,
+        lexer.token_kind.FORWARD_SLASH: binary_operator_kind.FORWARD_SLASH,
+        lexer.token_kind.STAR: binary_operator_kind.STAR,
+        lexer.token_kind.DOUBLE_STAR: binary_operator_kind.DOUBLE_STAR,
     }
+
+    return map[token.kind]
 }
 
 parse_binary_operation = fn (lhs) {
