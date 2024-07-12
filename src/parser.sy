@@ -64,7 +64,7 @@ precedence_from_token = fn (token) {
         lexer.token_kind.DOUBLE_STAR: precedence_kind.EXPONENT,
     }
 
-    if !contains(map_keys(map), token.kind) {
+    if !contains(map, token.kind) {
         return precedence_kind.LOWEST
     } else {
         return map[token.kind]
