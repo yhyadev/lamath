@@ -3,13 +3,9 @@ parser = import("parser.sy")
 evaluate = fn (procedure) {
     numbers = []
 
-    i = 0
-
-    while i < length(procedure) {
-        array_push(numbers, evaluate_step(procedure[i]))
-
-        i += 1
-    }
+    foreach(procedure, fn (step) {
+        array_push(numbers, evaluate_step(step))
+    })
 
     return numbers
 }

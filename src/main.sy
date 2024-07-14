@@ -26,13 +26,9 @@ run_repl = fn () {
 
         numbers = evaluator.evaluate(procedure)
 
-        i = 0
-
-        while i < length(numbers) {
-            println(numbers[i])
-
-            i += 1
-        }
+        foreach(numbers, fn (number) {
+            println(number)
+        })
     }
 }
 
@@ -59,23 +55,15 @@ evaluate_file = fn (file_path) {
 
     numbers = evaluator.evaluate(procedure)
 
-    i = 0
-
-    while i < length(numbers) {
-        println(numbers[i])
-
-        i += 1
-    }
+    foreach(numbers, fn (number) {
+        println(number)
+    })
 }
 
 evaluate_files = fn () {
-    i = 1
-
-    while i < length(process.argv) {
-        evaluate_file(process.argv[i])
-
-        i += 1
-    }
+    foreach(process.argv, fn (file_path) {
+        evaluate_file(file_path)
+    })
 }
 
 if length(process.argv) < 2 {
