@@ -1,4 +1,4 @@
-#!/bin/env -S syphon run
+#!/usr/bin/env -S syphon run
 
 fs = import("fs")
 io = import("io")
