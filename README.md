@@ -4,8 +4,10 @@ A math interpreter written in [Syphon](https://github.com/syphon-lang/syphon), [
 
 ## Quick Try
 
+You only need the latest version of Syphon
+
 ```console
-$ syphon src/main.sy
+$ ./bin/lamath
 >> 5 + 5
 10
 ```

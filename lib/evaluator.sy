@@ -33,7 +33,7 @@ evaluate_step = fn (step) {
             return lhs * rhs
         } else if step.operator == parser.binary_operator_kind.DOUBLE_STAR {
             return lhs ** rhs
-        } 
+        }
     }
 }
 
