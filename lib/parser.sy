@@ -20,21 +20,22 @@ init = fn (buffer) {
     }
 }
 
-token_value = fn (token) {
-    string_slice = fn (str, start, end) {
-        new_str = ""
+string_slice = fn (str, start, end) {
+    new_str = ""
 
-        i = start
+    i = start
 
-        while i < end {
-            new_str += str[i]
+    while i < end {
+        new_str += str[i]
 
-            i += 1
-        }
-
-        return new_str
+        i += 1
     }
 
+    return new_str
+}
+
+
+token_value = fn (token) {
     return string_slice(ctx.buffer, token.buffer_loc.start, token.buffer_loc.end)
 }
 
