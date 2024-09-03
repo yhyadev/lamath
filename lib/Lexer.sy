@@ -1,0 +1,114 @@
+state = {
+    "START": 0,
+    "NUMBER": 1,
+    "STAR": 2,
+}
+
+token_kind = {
+    "EOF": 0,
+    "INVALID": 1,
+    "NUMBER": 2,
+    "PLUS": 3,
+    "MINUS": 4,
+    "FORWARD_SLASH": 5,
+    "STAR": 6,
+    "DOUBLE_STAR": 7,
+}
+
+init = fn (buffer) {
+    index = 0
+    current_state = state.START 
+
+    is_space = fn (char) {
+        return contains([" ", "\n", "\r", "\t"], char)
+    }
+
+    is_digit = fn (char) {
+        return contains("0123456789", char)
+    }
+
+    vtable = {
+        "next_token": fn () {
+            token = {
+                "kind": token_kind.EOF,
+                "buffer_loc": {
+                    "start": index,
+                    "end": index,
+                }
+            }
+
+            while index < length(buffer) {
+                char = buffer[index]
+
+                if current_state == state.START {
+                    if is_space(char) {
+                        index += 1
+                        token.buffer_loc.start = index
+                        token.buffer_loc.end = index
+                        continue
+                    }
+
+                    if char == "+" {
+                        token.kind = token_kind.PLUS
+                        index += 1
+                        token.buffer_loc.end = index
+                        break
+                    } else if char == "-" {
+                        token.kind = token_kind.MINUS
+                        index += 1
+                        token.buffer_loc.end = index
+                        break
+                    } else if char == "/" {
+                        token.kind = token_kind.FORWARD_SLASH
+                        index += 1
+                        token.buffer_loc.end = index
+                        break
+                    } else if char == "*" {
+                        token.kind = token_kind.STAR
+                        current_state = state.STAR
+                    } else if is_digit(char) {
+                        token.kind = token_kind.NUMBER
+                        current_state = state.NUMBER
+                    } else {
+                        token.kind = token_kind.INVALID
+                        index += 1
+                        token.buffer_loc.end = index
+                        break
+                    }
+                } else if current_state == state.NUMBER {
+                    if !is_digit(char) {
+                        token.buffer_loc.end = index
+                        current_state = state.START
+                        break
+                    }
+                } else if current_state == state.STAR {
+                    if char == "*" {
+                        index += 1
+                        token.kind = token_kind.DOUBLE_STAR
+                        token.buffer_loc.end = index
+                        current_state = state.START
+                        break
+                    } else {
+                        index += 1
+                        token.buffer_loc.end = index
+                        current_state = state.START
+                        break
+                    }
+                }
+
+                index += 1
+                token.buffer_loc.end = index
+            }
+
+            return token
+        }
+    }
+
+    return vtable
+}
+
+
+export({
+    "token_kind": token_kind,
+    "init": init,
+})

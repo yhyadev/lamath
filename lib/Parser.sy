@@ -1,0 +1,230 @@
+Lexer = import("Lexer.sy")
+
+step_kind = {
+    "NUMBER": 0,
+    "BINARY_OPERATION": 1,
+    "UNARY_OPERATION": 2,
+}
+
+binary_operator_kind = {
+    "PLUS": 0,
+    "MINUS": 1,
+    "FORWARD_SLASH": 2,
+    "STAR": 3,
+    "DOUBLE_STAR": 4,
+}
+
+unary_operator_kind = {
+    "MINUS": 0,
+}
+
+init = fn (buffer) {
+    tokens = []
+    current_token_index = 0
+
+    lexer = Lexer.init(buffer)
+
+    while true {
+        token = lexer.next_token()
+
+        array_push(tokens, token)
+
+        if token.kind == Lexer.token_kind.EOF {
+            break
+        }
+    }
+
+    string_slice = fn (str, start, end) {
+        new_str = ""
+
+        i = start
+
+        while i < end {
+            new_str += str[i]
+
+            i += 1
+        }
+
+        return new_str
+    }
+
+
+    token_value = fn (token) {
+        return string_slice(buffer, token.buffer_loc.start, token.buffer_loc.end)
+    }
+
+    next_token = fn () {
+        token = tokens[current_token_index]
+        current_token_index += 1
+        return token
+    }
+
+    peek_token = fn () {
+        return tokens[current_token_index]
+    }
+
+    precedence_kind = {
+        "LOWEST": 0,
+        "SUM": 1,
+        "PRODUCT": 2,
+        "EXPONENT": 3,
+    }
+
+    precedence_from_token = fn (token) {
+        map = {
+            Lexer.token_kind.PLUS: precedence_kind.SUM,
+            Lexer.token_kind.MINUS: precedence_kind.SUM,
+            Lexer.token_kind.FORWARD_SLASH: precedence_kind.PRODUCT,
+            Lexer.token_kind.STAR: precedence_kind.PRODUCT,
+            Lexer.token_kind.DOUBLE_STAR: precedence_kind.EXPONENT,
+        }
+
+        if !contains(map, token.kind) {
+            return precedence_kind.LOWEST
+        } else {
+            return map[token.kind]
+        }
+    }
+
+    parse_number = fn () {
+        value = to_float(token_value(next_token()))
+
+        if value == none {
+            return "invalid number"
+        }
+
+        return {
+            "kind": step_kind.NUMBER,
+            "value": value,
+        }
+    }
+
+    is_unary_operator = fn (token) {
+        if token.kind == Lexer.token_kind.MINUS{
+            return true
+        } else {
+            return false
+        }
+    }
+
+    unary_operator_from_token = fn (token) {
+        map = {
+            Lexer.token_kind.MINUS: unary_operator_kind.MINUS,
+        }
+
+        return map[token.kind]
+    }
+
+    parse_unary_operation = fn () {
+        operator = unary_operator_from_token(next_token())
+
+        rhs = parse_step(precedence_kind.LOWEST)
+
+        return {
+            "kind": step_kind.UNARY_OPERATION,
+            "operator": operator,
+            "rhs": rhs,
+        }
+    }
+
+
+    parse_unary_expression = fn () {
+        if peek_token().kind == Lexer.token_kind.NUMBER {
+            return parse_number()
+        } else if is_unary_operator(peek_token()) {
+            return parse_unary_operation()
+        } else {
+            return "unexpected token"
+        }
+    }
+
+    is_binary_operator = fn (token) {
+        binary_operator_tokens = [
+            Lexer.token_kind.PLUS,
+            Lexer.token_kind.MINUS,
+            Lexer.token_kind.FORWARD_SLASH,
+            Lexer.token_kind.STAR,
+            Lexer.token_kind.DOUBLE_STAR,
+        ]
+
+        return contains(binary_operator_tokens, token.kind)
+    }
+
+    binary_operator_from_token = fn (token) {
+        map = {
+            Lexer.token_kind.PLUS: binary_operator_kind.PLUS,
+            Lexer.token_kind.MINUS: binary_operator_kind.MINUS,
+            Lexer.token_kind.FORWARD_SLASH: binary_operator_kind.FORWARD_SLASH,
+            Lexer.token_kind.STAR: binary_operator_kind.STAR,
+            Lexer.token_kind.DOUBLE_STAR: binary_operator_kind.DOUBLE_STAR,
+        }
+
+        return map[token.kind]
+    }
+
+    parse_binary_operation = fn (parse_step, lhs) {
+        operator = binary_operator_from_token(next_token())
+
+        rhs = parse_step(precedence_kind.LOWEST)
+
+        return {
+            "kind": step_kind.BINARY_OPERATION,
+            "lhs": lhs,
+            "operator": operator,
+            "rhs": rhs,
+        }
+    }
+
+    parse_binary_expression = fn (parse_step, lhs) {
+        if is_binary_operator(peek_token()) {
+            return parse_binary_operation(parse_step, lhs)
+        } else {
+            return "unexpected token"
+        }
+    }
+
+    parse_step = fn (precedence) {
+        lhs = parse_unary_expression()
+
+        if typeof(lhs) == "string" {
+            return lhs
+        }
+
+        while precedence < precedence_from_token(peek_token()) {
+            lhs = parse_binary_expression(parse_step, lhs)
+
+            if typeof(lhs) == "string" {
+                return lhs
+            }
+        }
+
+        return lhs
+    }
+
+    vtable = {
+        "parse": fn () {
+            procedure = []
+
+            while peek_token().kind != Lexer.token_kind.EOF {
+                step = parse_step(precedence_kind.LOWEST)
+
+                if typeof(step) == "string" {
+                    return step
+                }
+
+                array_push(procedure, step)
+            }
+
+            return procedure
+        }
+    }
+
+    return vtable
+}
+
+export({
+    "step_kind": step_kind,
+    "binary_operator_kind": binary_operator_kind,
+    "unary_operator_kind": unary_operator_kind,
+    "init": init,
+})
